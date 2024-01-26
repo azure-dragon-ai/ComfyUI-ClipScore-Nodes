@@ -1,9 +1,9 @@
 import torch
 from PIL import Image
 import numpy as np
-from hpsv2.src.open_clip import create_model_and_transforms, get_tokenizer
 import os
 from torchvision import transforms
+import clip
 
 # set HF_ENDPOINT=https://hf-mirror.com
 class Loader:
@@ -11,7 +11,7 @@ class Loader:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "path": ("STRING", {"default": "ClipScore\ClipScoreModels\HPS_v2_compressed.pt"}),
+                "model": ("STRING", {"default": "ViT-B/32"}),
                 "device": (("cuda", "cpu"),),
                 "dtype": (("float16", "bfloat16", "float32"),),
             },
@@ -19,40 +19,13 @@ class Loader:
 
     CATEGORY = "Haojihui/ClipScore"
     FUNCTION = "load"
-    RETURN_NAMES = ("MODEL", "TOKENIZER", "PROCESSOR")
-    RETURN_TYPES = ("PS_MODEL", "PS_TOKENIZER", "PS_PROCESSOR")
+    RETURN_NAMES = ("MODEL", "PROCESSOR")
+    RETURN_TYPES = ("PS_MODEL", "PS_PROCESSOR")
 
-    def load(self, path, device, dtype):
+    def load(self, model, device, dtype):
         dtype = torch.float32 if device == "cpu" else getattr(torch, dtype)
-        model, preprocess_train, preprocess_val = create_model_and_transforms(
-            'ViT-H-14',
-            'laion2B-s32B-b79K',
-            precision='amp',
-            device=device,
-            jit=False,
-            force_quick_gelu=False,
-            force_custom_text=False,
-            force_patch_dropout=False,
-            force_image_size=None,
-            pretrained_image=False,
-            image_mean=None,
-            image_std=None,
-            light_augmentation=True,
-            aug_cfg={},
-            output_dict=True,
-            with_score_predictor=False,
-            with_region_predictor=False
-        )
-        #model = AutoModel.from_pretrained(path, torch_dtype=dtype).eval().to(device)
-        #processor = AutoProcessor.from_pretrained(path)
-
-        # HPS_v2_compressed.pt
-        checkpoint = torch.load(path, map_location=device)
-        model.load_state_dict(checkpoint['state_dict'])
-        tokenizer = get_tokenizer('ViT-H-14')
-        model = model.to(device)
-        model.eval()
-        return (model, tokenizer, preprocess_val)
+        model, preprocess = clip.load(model, device=device)
+        return (model, preprocess)
 
 
 class ImageProcessor:
@@ -60,6 +33,7 @@ class ImageProcessor:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "model": ("PS_MODEL",),
                 "processor": ("PS_PROCESSOR",),
                 "device": (("cuda", "cpu"),),
                 "images": ("IMAGE",),
@@ -68,9 +42,9 @@ class ImageProcessor:
 
     CATEGORY = "Haojihui/ClipScore"
     FUNCTION = "process"
-    RETURN_TYPES = ("IMAGE_INPUTS",)
+    RETURN_TYPES = ("IMAGE_FEATURES",)
 
-    def process(self, processor, device, images):
+    def process(self, model, processor, device, images):
         print(images.shape)
         numpy = images[0].numpy()
         print(numpy.shape)
@@ -78,12 +52,76 @@ class ImageProcessor:
         print("imageTensor ", imageTensor.shape)
         image = transforms.ToPILImage()(imageTensor)
 
+        img = processor(image)
         
         #image = Image.fromarray(numpy)
-
-
+        features = model.encode_image(img.to(device))
         return (
-            processor(image).unsqueeze(0).to(device=device, non_blocking=True),
+            features,
+        )
+    
+class RealImageProcessor:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "model": ("PS_MODEL",),
+                "processor": ("PS_PROCESSOR",),
+                "device": (("cuda", "cpu"),),
+                "images": ("IMAGE",),
+            },
+        }
+
+    CATEGORY = "Haojihui/ClipScore"
+    FUNCTION = "process"
+    RETURN_TYPES = ("REAL_FEATURES",)
+
+    def process(self, model, processor, device, images):
+        print(images.shape)
+        numpy = images[0].numpy()
+        print(numpy.shape)
+        imageTensor = transforms.ToTensor()(numpy)
+        print("imageTensor ", imageTensor.shape)
+        image = transforms.ToPILImage()(imageTensor)
+
+        img = processor(image)
+        
+        #image = Image.fromarray(numpy)
+        features = model.encode_image(img.to(device))
+        return (
+            features,
+        )
+    
+class FakeImageProcessor:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "model": ("PS_MODEL",),
+                "processor": ("PS_PROCESSOR",),
+                "device": (("cuda", "cpu"),),
+                "images": ("IMAGE",),
+            },
+        }
+
+    CATEGORY = "Haojihui/ClipScore"
+    FUNCTION = "process"
+    RETURN_TYPES = ("FAKE_FEATURES",)
+
+    def process(self, model, processor, device, images):
+        print(images.shape)
+        numpy = images[0].numpy()
+        print(numpy.shape)
+        imageTensor = transforms.ToTensor()(numpy)
+        print("imageTensor ", imageTensor.shape)
+        image = transforms.ToPILImage()(imageTensor)
+
+        img = processor(image)
+        
+        #image = Image.fromarray(numpy)
+        features = model.encode_image(img.to(device))
+        return (
+            features,
         )
 
 
@@ -92,7 +130,7 @@ class TextProcessor:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "tokenizer": ("PS_TOKENIZER",),
+                "model": ("PS_MODEL",),
                 "device": (("cuda", "cpu"),),
                 "text": ("STRING", {"multiline": True}),
             },
@@ -100,16 +138,15 @@ class TextProcessor:
 
     CATEGORY = "Haojihui/ClipScore"
     FUNCTION = "process"
-    RETURN_NAMES = ("TEXT_TOKENIZER", "PROMPT")
-    RETURN_TYPES = ("PS_TEXT_TOKENIZER", "PS_PROMPT")
+    RETURN_NAMES = ("TEXT_FEATURES")
+    RETURN_TYPES = ("PS_TEXT_FEATURES")
 
-    def process(self, tokenizer, device, text):
-        prompt = text
-        print(prompt)
-        ret = tokenizer([prompt]).to(device=device, non_blocking=True)
-        print(ret)
+    def process(self, model, device, text):
+        data = clip.tokenize(text).squeeze()
+        features = model.encode_text(data.to(device))
+
         return (
-            ret, prompt
+            features
         )
 
 
@@ -119,9 +156,8 @@ class ImageScore:
         return {
             "required": {
                 "model": ("PS_MODEL",),
-                "image_inputs": ("IMAGE_INPUTS",),
-                "text_tokenizer": ("PS_TEXT_TOKENIZER",),
-                "prompt": ("PS_PROMPT",),
+                "real_features": ("REAL_FEATURES",),
+                "fake_features": ("FAKE_FEATURES",),
                 "device": (("cuda", "cpu"),),
             },
             "optional": {
@@ -137,26 +173,24 @@ class ImageScore:
     def imageScore(
         self,
         model,
-        image_inputs,
-        text_tokenizer,
-        prompt,
+        real_features,
+        fake_features,
         device
     ):
-        tokenizer = get_tokenizer('ViT-H-14')
-        with torch.no_grad():
-            # Calculate the HPS
-            with torch.cuda.amp.autocast():
-                print(image_inputs)
-                print(text_tokenizer)
-                print(prompt)
-                text_tokenizer = tokenizer([prompt]).to(device=device, non_blocking=True)
-                print(text_tokenizer)
-                outputs = model(image_inputs, text_tokenizer)
-                image_features, text_features = outputs["image_features"], outputs["text_features"]
-                logits_per_image = image_features @ text_features.T
+        logit_scale = model.logit_scale.exp()
 
-                hps_score = torch.diagonal(logits_per_image).cpu().numpy()
-            scores = hps_score[0]
+        # normalize features
+        real_features = real_features / real_features.norm(dim=1, keepdim=True).to(torch.float32)
+        fake_features = fake_features / fake_features.norm(dim=1, keepdim=True).to(torch.float32)
+        
+        # calculate scores
+        # score = logit_scale * real_features @ fake_features.t()
+        # score_acc += torch.diag(score).sum()
+        score = logit_scale * (fake_features * real_features).sum()
+        score_acc += score
+        sample_num += 1
+
+        scores = score_acc / sample_num
         scores_str = str(scores)
 
         return (scores_str, scores)
