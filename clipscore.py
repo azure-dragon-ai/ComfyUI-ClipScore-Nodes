@@ -11,20 +11,18 @@ class Loader:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "path": ("STRING", {"default": "HPSv2\HPSv2Models\HPS_v2_compressed.pt"}),
+                "path": ("STRING", {"default": "ClipScore\ClipScoreModels\HPS_v2_compressed.pt"}),
                 "device": (("cuda", "cpu"),),
                 "dtype": (("float16", "bfloat16", "float32"),),
             },
         }
 
-    CATEGORY = "Haojihui/HPSv2"
+    CATEGORY = "Haojihui/ClipScore"
     FUNCTION = "load"
     RETURN_NAMES = ("MODEL", "TOKENIZER", "PROCESSOR")
     RETURN_TYPES = ("PS_MODEL", "PS_TOKENIZER", "PS_PROCESSOR")
 
     def load(self, path, device, dtype):
-        # os.environ['HF_ENDPOINT'] = "https://hf-mirror.com"
-        # os.environ['HPS_ROOT'] = "HPSv2\HPSv2Models"
         dtype = torch.float32 if device == "cpu" else getattr(torch, dtype)
         model, preprocess_train, preprocess_val = create_model_and_transforms(
             'ViT-H-14',
@@ -68,7 +66,7 @@ class ImageProcessor:
             },
         }
 
-    CATEGORY = "Haojihui/HPSv2"
+    CATEGORY = "Haojihui/ClipScore"
     FUNCTION = "process"
     RETURN_TYPES = ("IMAGE_INPUTS",)
 
@@ -100,7 +98,7 @@ class TextProcessor:
             },
         }
 
-    CATEGORY = "Haojihui/HPSv2"
+    CATEGORY = "Haojihui/ClipScore"
     FUNCTION = "process"
     RETURN_NAMES = ("TEXT_TOKENIZER", "PROMPT")
     RETURN_TYPES = ("PS_TEXT_TOKENIZER", "PS_PROMPT")
@@ -131,7 +129,7 @@ class ImageScore:
             },
         }
 
-    CATEGORY = "Haojihui/HPSv2"
+    CATEGORY = "Haojihui/ClipScore"
     FUNCTION = "imageScore"
     RETURN_NAMES = ("SCORES", "SCORES1")
     RETURN_TYPES = ("STRING", "FLOAT")
@@ -165,15 +163,15 @@ class ImageScore:
 
 
 NODE_CLASS_MAPPINGS = {
-    "HaojihuiHPSv2Loader": Loader,
-    "HaojihuiHPSv2ImageProcessor": ImageProcessor,
-    "HaojihuiHPSv2TextProcessor": TextProcessor,
-    "HaojihuiHPSv2ImageScore": ImageScore,
+    "HaojihuiClipScoreLoader": Loader,
+    "HaojihuiClipScoreImageProcessor": ImageProcessor,
+    "HaojihuiClipScoreTextProcessor": TextProcessor,
+    "HaojihuiClipScoreImageScore": ImageScore,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "HaojihuiHPSv2Loader": "Loader",
-    "HaojihuiHPSv2ImageProcessor": "Image Processor",
-    "HaojihuiHPSv2TextProcessor": "Text Processor",
-    "HaojihuiHPSv2ImageScore": "ImageScore",
+    "HaojihuiClipScoreLoader": "Loader",
+    "HaojihuiClipScoreImageProcessor": "Image Processor",
+    "HaojihuiClipScoreTextProcessor": "Text Processor",
+    "HaojihuiClipScoreImageScore": "ImageScore",
 }
