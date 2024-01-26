@@ -1,0 +1,625 @@
+{
+  "last_node_id": 38,
+  "last_link_id": 74,
+  "nodes": [
+    {
+      "id": 17,
+      "type": "LoadImage",
+      "pos": [
+        91,
+        518
+      ],
+      "size": [
+        315,
+        314.00000381469727
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "0244e29ef1f2939f65a77ed29ceb9b6.png",
+        "image"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "ZuellniPickScoreImageProcessor",
+      "pos": [
+        483,
+        -45
+      ],
+      "size": {
+        "0": 279.5999755859375,
+        "1": 46
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "processor",
+          "type": "PS_PROCESSOR",
+          "link": 11
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 69
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE_INPUTS",
+          "type": "IMAGE_INPUTS",
+          "links": [
+            15
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ZuellniPickScoreImageProcessor"
+      }
+    },
+    {
+      "id": 12,
+      "type": "ZuellniPickScoreLoader",
+      "pos": [
+        96,
+        -45
+      ],
+      "size": {
+        "0": 315,
+        "1": 126
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "PS_MODEL",
+          "links": [
+            24
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "PROCESSOR",
+          "type": "PS_PROCESSOR",
+          "links": [
+            11,
+            13
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ZuellniPickScoreLoader"
+      },
+      "widgets_values": [
+        "\\\\NAS65A682\\SD-Share\\models\\Score\\PickScore_v1old",
+        "cuda",
+        "bfloat16"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "Save Text File",
+      "pos": [
+        1326,
+        -36
+      ],
+      "size": [
+        315,
+        154
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 23,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Save Text File"
+      },
+      "widgets_values": [
+        "",
+        "\\\\NAS65A682\\Web\\Resource\\ResDev\\ComfyUI\\Score/[time(%Y-%m-%d)]",
+        "ComfyUI",
+        "_",
+        4
+      ]
+    },
+    {
+      "id": 14,
+      "type": "ZuellniPickScoreSelector",
+      "pos": [
+        952,
+        -39
+      ],
+      "size": {
+        "0": 315,
+        "1": 182
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "PS_MODEL",
+          "link": 24
+        },
+        {
+          "name": "image_inputs",
+          "type": "IMAGE_INPUTS",
+          "link": 15
+        },
+        {
+          "name": "text_inputs",
+          "type": "TEXT_INPUTS",
+          "link": 14
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 68,
+          "slot_index": 3
+        },
+        {
+          "name": "latents",
+          "type": "LATENT",
+          "link": null
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SCORES",
+          "type": "STRING",
+          "links": [
+            23
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": [
+            22
+          ],
+          "shape": 3,
+          "slot_index": 1
+        },
+        {
+          "name": "LATENTS",
+          "type": "LATENT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "MASKS",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ZuellniPickScoreSelector"
+      },
+      "widgets_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": 10,
+      "type": "LoadImage",
+      "pos": [
+        94,
+        156
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "SampleSv00016.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "PreviewImage",
+      "pos": [
+        958,
+        201
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 22
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 15,
+      "type": "ZuellniPickScoreTextProcessor",
+      "pos": [
+        483,
+        64
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "processor",
+          "type": "PS_PROCESSOR",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "TEXT_INPUTS",
+          "type": "TEXT_INPUTS",
+          "links": [
+            14
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ZuellniPickScoreTextProcessor"
+      },
+      "widgets_values": [
+        "Beautiful girl"
+      ]
+    },
+    {
+      "id": 18,
+      "type": "ImageBatch",
+      "pos": [
+        491,
+        342
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 74
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 71,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            58,
+            68,
+            69
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageBatch"
+      }
+    },
+    {
+      "id": 38,
+      "type": "LoadImage",
+      "pos": [
+        499,
+        519
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            71
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "SampleSv00023.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 37,
+      "type": "LoadImage",
+      "pos": [
+        857,
+        521
+      ],
+      "size": [
+        315,
+        314.00000381469727
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            70,
+            74
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "256a70ea1089dd089950f1efcbba0c2.png",
+        "image"
+      ]
+    },
+    {
+      "id": 35,
+      "type": "ImageBatch",
+      "pos": [
+        1333,
+        173
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 58
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "link": 70,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageBatch"
+      }
+    }
+  ],
+  "links": [
+    [
+      11,
+      12,
+      1,
+      13,
+      0,
+      "PS_PROCESSOR"
+    ],
+    [
+      13,
+      12,
+      1,
+      15,
+      0,
+      "PS_PROCESSOR"
+    ],
+    [
+      14,
+      15,
+      0,
+      14,
+      2,
+      "TEXT_INPUTS"
+    ],
+    [
+      15,
+      13,
+      0,
+      14,
+      1,
+      "IMAGE_INPUTS"
+    ],
+    [
+      22,
+      14,
+      1,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      23,
+      14,
+      0,
+      21,
+      0,
+      "STRING"
+    ],
+    [
+      24,
+      12,
+      0,
+      14,
+      0,
+      "PS_MODEL"
+    ],
+    [
+      58,
+      18,
+      0,
+      35,
+      0,
+      "IMAGE"
+    ],
+    [
+      68,
+      18,
+      0,
+      14,
+      3,
+      "IMAGE"
+    ],
+    [
+      69,
+      18,
+      0,
+      13,
+      1,
+      "IMAGE"
+    ],
+    [
+      70,
+      37,
+      0,
+      35,
+      1,
+      "IMAGE"
+    ],
+    [
+      71,
+      38,
+      0,
+      18,
+      1,
+      "IMAGE"
+    ],
+    [
+      74,
+      37,
+      0,
+      18,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
