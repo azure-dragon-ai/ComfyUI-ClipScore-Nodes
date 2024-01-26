@@ -199,6 +199,8 @@ class ImageScore:
 NODE_CLASS_MAPPINGS = {
     "HaojihuiClipScoreLoader": Loader,
     "HaojihuiClipScoreImageProcessor": ImageProcessor,
+    "HaojihuiClipScoreRealImageProcessor": RealImageProcessor,
+    "HaojihuiClipScoreFakeImageProcessor": FakeImageProcessor,
     "HaojihuiClipScoreTextProcessor": TextProcessor,
     "HaojihuiClipScoreImageScore": ImageScore,
 }
@@ -206,6 +208,8 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "HaojihuiClipScoreLoader": "Loader",
     "HaojihuiClipScoreImageProcessor": "Image Processor",
+    "HaojihuiClipScoreRealImageProcessor": "Real Image Processor",
+    "HaojihuiClipScoreFakeImageProcessor": "Fake Image Processor",
     "HaojihuiClipScoreTextProcessor": "Text Processor",
     "HaojihuiClipScoreImageScore": "ImageScore",
 }
